@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 futures = "0.3.30"
+json = "0.12.4"
 
 [dependencies.async-std]
 version = "1.6"
