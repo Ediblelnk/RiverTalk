@@ -1,5 +1,1 @@
-// use rivertalk;
-
-fn main() {
-    
-}
+fn main() {}

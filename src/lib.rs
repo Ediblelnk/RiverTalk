@@ -1,31 +1,65 @@
+pub mod packet;
+
+use async_std::net::{TcpListener, TcpStream};
+use futures::{select, stream::FuturesUnordered, StreamExt};
 use json::JsonValue;
+use std::net::SocketAddrV6;
 
-pub trait Receiver {
-    fn receive(&self) -> JsonValue;
-}
+pub struct Error;
 
-pub trait Distributor {
-    fn distribute(&self, obj: JsonValue) -> Result<(), Error>;
-}
-
-#[derive(Debug)]
-pub enum Error {
-    Fatal(String),
+pub struct Client {
+    hash: [u8; 512],
+    stream: TcpStream,
 }
 
 pub struct Server {
-    receiver: Box<dyn Receiver>,
-    distributor: Box<dyn Distributor>, 
+    clients: Vec<Client>,
+    address: SocketAddrV6,
 }
 
 impl Server {
-    pub fn new(receiver: Box<dyn Receiver>, distributor: Box<dyn Distributor>) -> Self {
-        Self {receiver, distributor}
+    pub fn new(address: SocketAddrV6) -> Self {
+        Self {
+            clients: vec![],
+            address,
+        }
     }
 
-    pub fn run(self: Self) -> Self {
-        let obj = self.receiver.receive();
-        self.distributor.distribute(obj).unwrap();
+    pub async fn run(self: Self) -> Self {
         self
+    }
+
+    async fn receive(mut self: Self) -> JsonValue {
+        let mut incoming = FuturesUnordered::new();
+        self.clients
+            .iter_mut()
+            .for_each(|client| incoming.push(packet::receive(&mut client.stream)));
+
+        select! {
+            here = incoming.select_next_some() => return here.unwrap()
+        }
+    }
+
+    async fn new_client(self: Self) -> TcpStream {
+        TcpListener::bind(self.address)
+            .await
+            .unwrap()
+            .incoming()
+            .next()
+            .await
+            .unwrap()
+            .unwrap()
+    }
+
+    // TODO! refactor this to actually use concurrency
+    async fn distribute(mut self: Self, obj: JsonValue) -> Result<(), packet::Error> {
+        let mut outgoing = FuturesUnordered::new();
+        self.clients
+            .iter_mut()
+            .for_each(|client| outgoing.push(packet::send(&mut client.stream, obj.clone())));
+
+        // TODO! this doesn't actually send out the packets just yet
+
+        Ok(())
     }
 }
