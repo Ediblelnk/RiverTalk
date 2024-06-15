@@ -9,8 +9,14 @@ use crate::packet;
 pub struct Error;
 
 #[derive(Clone)]
-pub struct Client {
+struct Client {
     stream: TcpStream,
+}
+
+impl Client {
+    fn new(stream: TcpStream) -> Self {
+        Self { stream }
+    }
 }
 
 pub struct Server {
@@ -28,9 +34,7 @@ impl Server {
 
     pub async fn run(mut self: Self) -> Result<Self, Error> {
         let first_client = Self::new_client(self.address).await;
-        self.clients.push(Client {
-            stream: first_client,
-        });
+        self.clients.push(Client::new(first_client));
 
         loop {
             let new_client = Self::new_client(self.address).fuse();
@@ -43,7 +47,7 @@ impl Server {
                 obj = receive => println!("{obj}")
             }
         }
-        Ok(self)
+        // Ok(self)
     }
 
     async fn receive(mut clients: Vec<Client>) -> JsonValue {
@@ -68,10 +72,9 @@ impl Server {
             .unwrap()
     }
 
-    // TODO! refactor this to actually use concurrency
-    async fn distribute(mut self: Self, obj: JsonValue) -> Result<(), packet::Error> {
+    async fn send(mut clients: Vec<Client>, obj: JsonValue) -> Result<(), packet::Error> {
         let mut outgoing = FuturesUnordered::new();
-        self.clients
+        clients
             .iter_mut()
             .for_each(|client| outgoing.push(packet::send(&mut client.stream, obj.clone())));
 

@@ -5,10 +5,7 @@ use async_std::{
 use json::JsonValue;
 
 #[derive(Debug)]
-pub enum Error {
-    Fatal(String),
-    Receive,
-}
+pub struct Error(&'static str);
 
 pub async fn receive(stream: &mut TcpStream) -> Result<JsonValue, Error> {
     let mut packet_size_buffer: [u8; 8] = [0; 8];
