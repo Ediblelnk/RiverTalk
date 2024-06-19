@@ -1,0 +1,43 @@
+import { LineEdit, Button, ScrollView, TextEdit } from "std-widgets.slint";
+import { Page } from "../../lib/page.slint";
+import { SideBar } from "../../lib/side_bar.slint";
+
+export component MessagePage inherits Page {
+    title: @tr("Message");
+    VerticalLayout {
+        HorizontalLayout {
+            height: 50px;
+            LineEdit {
+                font-size: 16px;
+                placeholder-text: "IP:PORT";
+            }
+
+            Button {
+                text: "Connect";
+            }
+
+            Button {
+                text: "Not Connected";
+                enabled: false;
+            }
+        }
+
+        TextEdit {
+            min-height: 100px;
+            read-only: true;
+        }
+
+        HorizontalLayout {
+            height: 50px;
+            LineEdit {
+                font-size: 16px;
+                placeholder-text: "Message";
+            }
+
+            Button {
+                text: "Send";
+                width: 100px;
+            }
+        }
+    }
+}

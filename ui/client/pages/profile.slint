@@ -1,0 +1,17 @@
+import { LineEdit, Button, ScrollView, TextEdit } from "std-widgets.slint";
+import { Page } from "../../lib/page.slint";
+import { SideBar } from "../../lib/side_bar.slint";
+
+export component ProfilePage inherits Page {
+    title: @tr("Profile");
+    VerticalLayout {
+        LineEdit {
+            height: 50px;
+            placeholder-text: "Name";
+        }
+
+        LineEdit {
+            placeholder-text: "Color";
+        }
+    }
+}

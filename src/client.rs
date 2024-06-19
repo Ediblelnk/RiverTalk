@@ -31,7 +31,9 @@ impl Client {
         })
     }
 
-    pub async fn run(mut self: Self) -> Result<Self, Error> {}
+    pub async fn run(mut self: Self) -> Result<Self, Error> {
+        unimplemented!();
+    }
 
     async fn receive(mut server: Server) -> Result<JsonValue, packet::Error> {
         packet::receive(&mut server.stream).await
