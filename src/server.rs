@@ -1,6 +1,6 @@
 use async_std::net::{TcpListener, TcpStream};
 use futures::{pin_mut, select, stream::FuturesUnordered, FutureExt, StreamExt};
-use json::JsonValue;
+use jzon::JsonValue;
 use std::net::SocketAddrV6;
 
 use crate::packet;

@@ -4,7 +4,7 @@ use std::{
     time::Duration,
 };
 
-use json::object;
+use jzon::object;
 use rivertalk::packet;
 
 #[async_std::main]

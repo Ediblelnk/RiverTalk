@@ -1,5 +1,5 @@
 use async_std::net::TcpStream;
-use json::JsonValue;
+use jzon::JsonValue;
 use std::net::SocketAddrV6;
 
 use crate::packet;
